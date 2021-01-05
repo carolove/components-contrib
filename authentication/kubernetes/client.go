@@ -16,15 +16,12 @@ import (
 )
 
 // nolint:gochecknoglobals
-var kubeconfig *string
+var kubeconfig string
 
 // nolint:gochecknoinits
 func init() {
-	if home := homedir.HomeDir(); home != "" {
-		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	} else {
-		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
-	}
+	kubeconfig = filepath.Join(homedir.HomeDir(), ".kube", "config")
+
 }
 
 // GetKubeClient returns a kubernetes client
@@ -32,7 +29,7 @@ func GetKubeClient() (*kubernetes.Clientset, error) {
 	flag.Parse()
 	conf, err := rest.InClusterConfig()
 	if err != nil {
-		conf, err = clientcmd.BuildConfigFromFlags("", *kubeconfig)
+		conf, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
 		if err != nil {
 			return nil, err
 		}
